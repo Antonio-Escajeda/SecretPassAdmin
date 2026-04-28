@@ -1,0 +1,13 @@
+services:
+  api:
+    environment:
+      NODE_ENV: production
+      TRUST_PROXY: "true"
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    restart: unless-stopped
+
+  web:
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
