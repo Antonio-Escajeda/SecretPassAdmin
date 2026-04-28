@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { redis } from "../redis.js";
 import { createSecretSchema } from "../schemas.js";
 import { audit, hashId } from "../audit.js";
+import { config } from "../config.js";
 
 const ID_REGEX = /^[A-Za-z0-9_-]{20,80}$/;
 
@@ -12,8 +13,11 @@ export const secretRoutes: FastifyPluginAsync = async (fastify) => {
       rateLimit: {
         max: 50,
         timeWindow: "1 hour",
-        errorResponseBuilder: () => ({
-          error: "Too many secrets created. Try again later.",
+        errorResponseBuilder: (_request, context) => ({
+          statusCode: 429,
+          error: "Too Many Requests",
+          message: "Too many secrets created. Try again later.",
+          retryAfter: Math.ceil(context.ttl / 1000),
         }),
       },
     },
@@ -22,7 +26,9 @@ export const secretRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (!result.success) {
       audit("secret.invalid_payload", { ip: request.ip });
-      return reply.status(400).send({ error: "Invalid payload", issues: result.error.issues });
+      const body: Record<string, unknown> = { error: "Invalid payload" };
+      if (config.NODE_ENV !== "production") body.issues = result.error.issues;
+      return reply.status(400).send(body);
     }
 
     const { ciphertext, iv, salt, ttlSeconds } = result.data;
@@ -56,8 +62,11 @@ export const secretRoutes: FastifyPluginAsync = async (fastify) => {
       rateLimit: {
         max: 300,
         timeWindow: "1 hour",
-        errorResponseBuilder: () => ({
-          error: "Too many requests. Try again later.",
+        errorResponseBuilder: (_request, context) => ({
+          statusCode: 429,
+          error: "Too Many Requests",
+          message: "Too many requests. Try again later.",
+          retryAfter: Math.ceil(context.ttl / 1000),
         }),
       },
     },

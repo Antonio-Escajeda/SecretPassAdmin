@@ -46,13 +46,24 @@ await fastify.register(rateLimit, {
 
 await fastify.register(metrics, { endpoint: "/metrics" });
 
-fastify.addHook("onSend", async (_request, reply) => {
+// Proteger /metrics en producción — solo accesible desde localhost
+fastify.addHook("onRequest", async (request, reply) => {
+  if (request.url !== "/metrics") return;
+  if (config.NODE_ENV !== "production") return;
+  const ip = request.ip;
+  if (ip !== "127.0.0.1" && ip !== "::1") {
+    return reply.status(403).send({ error: "Forbidden" });
+  }
+});
+
+fastify.addHook("onSend", async (request, reply) => {
   void reply.header("Cache-Control", "no-store");
   void reply.header("Pragma", "no-cache");
   void reply.header("Expires", "0");
   void reply.header("Referrer-Policy", "no-referrer");
   void reply.header("X-Content-Type-Options", "nosniff");
   void reply.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  void reply.header("X-Request-ID", request.id);
 });
 
 fastify.get("/health", async () => ({ ok: true }));
