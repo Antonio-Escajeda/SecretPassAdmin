@@ -95,7 +95,7 @@ export async function encryptSecretWithPassphrase(
   );
 
   const aesKey = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: saltBytes, iterations: 310000, hash: "SHA-256" },
+    { name: "PBKDF2", salt: saltBytes, iterations: 600000, hash: "SHA-256" },
     pbkdf2Key,
     { name: "AES-GCM", length: 256 },
     false,
@@ -137,7 +137,7 @@ export async function decryptSecretWithPassphrase(params: {
   );
 
   const aesKey = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: saltBytes, iterations: 310000, hash: "SHA-256" },
+    { name: "PBKDF2", salt: saltBytes, iterations: 600000, hash: "SHA-256" },
     pbkdf2Key,
     { name: "AES-GCM", length: 256 },
     false,
