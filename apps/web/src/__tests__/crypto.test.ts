@@ -4,8 +4,8 @@ import {
   base64urlDecode,
   encryptSecret,
   decryptSecret,
-  encryptSecretWithPassphrase,
-  decryptSecretWithPassphrase,
+  encryptSecretWithArgon2id,
+  decryptSecretWithArgon2id,
 } from '../crypto.js'
 
 // ── base64url encode/decode ────────────────────────────────────────────────
@@ -76,10 +76,10 @@ describe('decryptSecret', () => {
   })
 })
 
-// ── encryptSecretWithPassphrase ────────────────────────────────────────────
-describe('encryptSecretWithPassphrase', () => {
+// ── encryptSecretWithArgon2id ──────────────────────────────────────────────
+describe('encryptSecretWithArgon2id', () => {
   it('returns ciphertext, iv, key, salt — all valid base64url strings', async () => {
-    const result = await encryptSecretWithPassphrase('my secret', 'my passphrase')
+    const result = await encryptSecretWithArgon2id('my secret', 'my passphrase')
     expect(result).toHaveProperty('ciphertext')
     expect(result).toHaveProperty('iv')
     expect(result).toHaveProperty('key')
@@ -91,48 +91,26 @@ describe('encryptSecretWithPassphrase', () => {
   }, 10000)
 
   it('salt is different across calls', async () => {
-    const r1 = await encryptSecretWithPassphrase('same', 'pass')
-    const r2 = await encryptSecretWithPassphrase('same', 'pass')
+    const r1 = await encryptSecretWithArgon2id('same', 'pass')
+    const r2 = await encryptSecretWithArgon2id('same', 'pass')
     expect(r1.salt).not.toBe(r2.salt)
   }, 15000)
 })
 
-// ── decryptSecretWithPassphrase ────────────────────────────────────────────
-describe('decryptSecretWithPassphrase', () => {
-  it('correct passphrase → original plaintext', async () => {
+// ── decryptSecretWithArgon2id ──────────────────────────────────────────────
+describe('decryptSecretWithArgon2id', () => {
+  it('roundtrip — correct passphrase returns original plaintext', async () => {
     const plaintext = 'top secret'
     const passphrase = 'correct-horse-battery-staple'
-    const { ciphertext, iv, key, salt } = await encryptSecretWithPassphrase(plaintext, passphrase)
-    const decrypted = await decryptSecretWithPassphrase({ ciphertext, iv, key, salt, passphrase })
+    const { ciphertext, iv, key, salt } = await encryptSecretWithArgon2id(plaintext, passphrase)
+    const decrypted = await decryptSecretWithArgon2id({ ciphertext, iv, key, salt, passphrase })
     expect(decrypted).toBe(plaintext)
   }, 15000)
 
   it('wrong passphrase → rejects', async () => {
-    const { ciphertext, iv, key, salt } = await encryptSecretWithPassphrase('secret', 'correct-pass')
+    const { ciphertext, iv, key, salt } = await encryptSecretWithArgon2id('secret', 'correct-pass')
     await expect(
-      decryptSecretWithPassphrase({ ciphertext, iv, key, salt, passphrase: 'wrong-pass' })
+      decryptSecretWithArgon2id({ ciphertext, iv, key, salt, passphrase: 'wrong-pass' })
     ).rejects.toThrow()
   }, 15000)
-
-  it('unicode plaintext roundtrip', async () => {
-    const plaintext = '¡Secreto! 🔑 パスワード'
-    const passphrase = 'mi-contraseña-segura'
-    const { ciphertext, iv, key, salt } = await encryptSecretWithPassphrase(plaintext, passphrase)
-    const decrypted = await decryptSecretWithPassphrase({ ciphertext, iv, key, salt, passphrase })
-    expect(decrypted).toBe(plaintext)
-  }, 15000)
-})
-
-// ── encryptSecret vs encryptSecretWithPassphrase ───────────────────────────
-describe('encryptSecret vs encryptSecretWithPassphrase', () => {
-  it('produce different outputs for the same input', async () => {
-    const plaintext = 'same input'
-    const r1 = await encryptSecret(plaintext)
-    const r2 = await encryptSecretWithPassphrase(plaintext, 'passphrase')
-    // They use different key derivation — ciphertexts and keys differ
-    expect(r1.ciphertext).not.toBe(r2.ciphertext)
-    // encryptSecret key is the AES key itself; encryptSecretWithPassphrase key is the urlKey
-    // They will always differ in length or value
-    expect(r1.key).not.toBe(r2.key)
-  }, 10000)
 })

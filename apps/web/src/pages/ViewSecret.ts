@@ -1,4 +1,4 @@
-import { decryptSecret, decryptSecretWithPassphrase } from "../crypto.js";
+import { decryptSecret, decryptSecretWithArgon2id } from "../crypto.js";
 import { revealSecretFromServer } from "../api.js";
 
 type Phase = "pending" | "passphrase" | "loading" | "ready" | "error";
@@ -182,7 +182,7 @@ export function createViewSecretPage(): HTMLElement {
     if (!encryptedData || !fragmentKey) return;
     passphraseErrorP.style.display = "none";
     try {
-      plaintextArea.value = await decryptSecretWithPassphrase({
+      plaintextArea.value = await decryptSecretWithArgon2id({
         ciphertext: encryptedData.ciphertext,
         iv: encryptedData.iv,
         salt: encryptedData.salt ?? "",

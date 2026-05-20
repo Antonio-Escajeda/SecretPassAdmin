@@ -54,6 +54,7 @@ async function handleCreateSecret(ctx: Context): Promise<void> {
   const payload = JSON.stringify({
     version: 1,
     algorithm: "AES-256-GCM",
+    kdf: "argon2id",
     ciphertext,
     iv,
     salt: salt ?? null,

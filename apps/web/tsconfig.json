@@ -16,5 +16,6 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
+  "exclude": ["src/__tests__/argon2id-node.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -75,29 +75,32 @@ export async function decryptSecret(params: {
   return new TextDecoder().decode(plaintext);
 }
 
-export async function encryptSecretWithPassphrase(
+import loadWasm from "argon2id";
+
+let _argon2id: Awaited<ReturnType<typeof loadWasm>> | null = null;
+async function getArgon2id() {
+  if (!_argon2id) _argon2id = await loadWasm();
+  return _argon2id;
+}
+
+export async function encryptSecretWithArgon2id(
   secret: string,
   passphrase: string
 ): Promise<{ ciphertext: string; iv: string; key: string; salt: string }> {
+  const argon2id = await getArgon2id();
   const urlKeyBytes = crypto.getRandomValues(new Uint8Array(32));
   const saltBytes = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
   const urlKeyB64 = base64urlEncode(urlKeyBytes);
-  const passwordBytes = new TextEncoder().encode(passphrase + ":" + urlKeyB64);
+  const password = new TextEncoder().encode(passphrase + ":" + urlKeyB64);
 
-  const pbkdf2Key = await crypto.subtle.importKey(
+  const keyBytes = argon2id({ password, salt: saltBytes, parallelism: 1, passes: 2, memorySize: 19456, tagLength: 32 });
+
+  const aesKey = await crypto.subtle.importKey(
     "raw",
-    passwordBytes,
-    "PBKDF2",
-    false,
-    ["deriveKey"]
-  );
-
-  const aesKey = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: saltBytes, iterations: 600000, hash: "SHA-256" },
-    pbkdf2Key,
-    { name: "AES-GCM", length: 256 },
+    keyBytes as Uint8Array<ArrayBuffer>,
+    { name: "AES-GCM" },
     false,
     ["encrypt"]
   );
@@ -116,30 +119,25 @@ export async function encryptSecretWithPassphrase(
   };
 }
 
-export async function decryptSecretWithPassphrase(params: {
+export async function decryptSecretWithArgon2id(params: {
   ciphertext: string;
   iv: string;
   key: string;
   salt: string;
   passphrase: string;
 }): Promise<string> {
+  const argon2id = await getArgon2id();
   const saltBytes = base64urlDecode(params.salt);
   const iv = base64urlDecode(params.iv);
   const ciphertext = base64urlDecode(params.ciphertext);
-  const passwordBytes = new TextEncoder().encode(params.passphrase + ":" + params.key);
+  const password = new TextEncoder().encode(params.passphrase + ":" + params.key);
 
-  const pbkdf2Key = await crypto.subtle.importKey(
+  const keyBytes = argon2id({ password, salt: saltBytes, parallelism: 1, passes: 2, memorySize: 19456, tagLength: 32 });
+
+  const aesKey = await crypto.subtle.importKey(
     "raw",
-    passwordBytes,
-    "PBKDF2",
-    false,
-    ["deriveKey"]
-  );
-
-  const aesKey = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: saltBytes, iterations: 600000, hash: "SHA-256" },
-    pbkdf2Key,
-    { name: "AES-GCM", length: 256 },
+    keyBytes as Uint8Array<ArrayBuffer>,
+    { name: "AES-GCM" },
     false,
     ["decrypt"]
   );

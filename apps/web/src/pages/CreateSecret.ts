@@ -1,4 +1,4 @@
-import { encryptSecret, encryptSecretWithPassphrase } from "../crypto.js";
+import { encryptSecret, encryptSecretWithArgon2id } from "../crypto.js";
 import { createSecretOnServer } from "../api.js";
 
 const MAX_DAYS = 7;
@@ -342,7 +342,7 @@ export function createCreateSecretPage(): HTMLElement {
     try {
       let encrypted: { ciphertext: string; iv: string; key: string; salt?: string };
       if (usePassphrase) {
-        encrypted = await encryptSecretWithPassphrase(secretTextarea.value, passphraseInput.value);
+        encrypted = await encryptSecretWithArgon2id(secretTextarea.value, passphraseInput.value);
       } else {
         encrypted = await encryptSecret(secretTextarea.value);
       }
