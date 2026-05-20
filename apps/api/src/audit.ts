@@ -1,7 +1,11 @@
 import { createHash } from "node:crypto";
-import pino from "pino";
 
-const auditLogger = pino({ name: "audit" });
+const auditLogger = {
+  info: (data: object) =>
+    process.stdout.write(
+      JSON.stringify({ level: "info", name: "audit", time: Date.now(), ...data }) + "\n"
+    ),
+};
 
 function hashId(id: string): string {
   return createHash("sha256").update(id).digest("hex").slice(0, 16);
