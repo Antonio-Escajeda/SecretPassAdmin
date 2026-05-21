@@ -381,6 +381,7 @@ npm run test:watch
 | [SubtleCrypto.encrypt() — MDN](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt) | Detalle de AES-GCM y parámetros del algoritmo |
 | [Argon2id — RFC 9106](https://www.rfc-editor.org/rfc/rfc9106) | Especificación del algoritmo Argon2id |
 | [argon2id npm](https://www.npmjs.com/package/argon2id) | Implementación WebAssembly usada en el frontend |
+| [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) | Guía de referencia para almacenamiento seguro de contraseñas — base de la elección de Argon2id y sus parámetros |
 | [crypto.getRandomValues() — MDN](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) | Generación del IV de 96 bits y salt de 16 bytes |
 
 ### Backend
