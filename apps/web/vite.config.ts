@@ -5,6 +5,9 @@ import { resolve } from "node:path";
 // which Rollup 4 / Vite 5 cannot bundle. We alias the package to a local shim
 // that loads the same WASM files via fetch() using Vite's ?url asset handling.
 export default defineConfig({
+  build: {
+    assetsInlineLimit: 0, // prevent WASM files from being inlined as data: URIs (breaks CSP connect-src 'self')
+  },
   resolve: {
     alias: [
       {

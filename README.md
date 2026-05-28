@@ -384,7 +384,7 @@ npm run test:watch
 | [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) | Guía de referencia para almacenamiento seguro de contraseñas — base de la elección de Argon2id y sus parámetros |
 | [crypto.getRandomValues() — MDN](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) | Generación del IV de 96 bits y salt de 16 bytes |
 
-### Backend
+### Backend (NdeJS)
 
 | Referencia | Descripción |
 | --- | --- |
@@ -400,7 +400,7 @@ npm run test:watch
 | [SET EX — Redis](https://redis.io/commands/set/) | Almacenamiento del secreto con TTL nativo |
 | [RESP2 — Redis protocol](https://redis.io/docs/reference/protocol-spec/) | Protocolo de serialización implementado sobre `node:net` |
 
-### Frontend
+### Frontend (Vite)
 
 | Referencia | Descripción |
 | --- | --- |

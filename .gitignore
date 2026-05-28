@@ -1,5 +1,8 @@
 node_modules/
 .env
 NOTAS.md
+NGINX_OPERACION.md
 dist/
 certs/
+SecretPassAdmin.code-workspace
+evidence/
