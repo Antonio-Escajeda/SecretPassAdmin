@@ -35,6 +35,7 @@ docker compose down
 ./up.sh
 ./up.sh tunnel
 ./down.sh
+./down.sh tunnel
 ```
 
 ## Principio fundamental
@@ -350,6 +351,7 @@ También podés usar los wrappers del proyecto:
 ./up.sh
 ./up.sh tunnel
 ./down.sh
+./down.sh tunnel
 ```
 
 ---
