@@ -3,6 +3,40 @@
 Servicio interno para compartir secretos de un solo uso con cifrado zero-knowledge.
 Extiende la versión base con soporte de passphrase opcional usando Argon2id.
 
+## Comandos rápidos
+
+### Levantar sin túnel
+
+```bash
+docker compose up -d
+```
+
+### Levantar con túnel temporal de Cloudflare
+
+```bash
+docker compose --profile tunnel up -d
+```
+
+### Ver la URL pública actual del túnel
+
+```bash
+docker compose logs cloudflared --tail 50 | rg 'trycloudflare.com'
+```
+
+### Bajar todo
+
+```bash
+docker compose down
+```
+
+### Wrappers opcionales
+
+```bash
+./up.sh
+./up.sh tunnel
+./down.sh
+```
+
 ## Principio fundamental
 
 El servidor **nunca ve el texto plano**. Todo el cifrado ocurre en el navegador del creador y todo el descifrado ocurre en el navegador del receptor. La clave de descifrado viaja únicamente en el fragmento `#` de la URL, que los navegadores nunca envían en las peticiones HTTP.
@@ -268,12 +302,55 @@ secret-service/
 
 ## Levantar el proyecto
 
+### Sin túnel
+
 ```bash
 cd secret-service
-docker compose up --build
+docker compose up -d
 ```
 
+Levanta:
+
+- `redis`
+- `api`
+- `web`
+
 Abre `http://localhost` en el navegador.
+
+### Con túnel público temporal (Cloudflare Quick Tunnel)
+
+```bash
+docker compose --profile tunnel up -d
+```
+
+Levanta:
+
+- `redis`
+- `api`
+- `web`
+- `cloudflared`
+
+La URL pública temporal se puede consultar con:
+
+```bash
+docker compose logs cloudflared --tail 50 | rg 'trycloudflare.com'
+```
+
+### Bajar todo
+
+```bash
+docker compose down
+```
+
+### Scripts auxiliares
+
+También podés usar los wrappers del proyecto:
+
+```bash
+./up.sh
+./up.sh tunnel
+./down.sh
+```
 
 ---
 

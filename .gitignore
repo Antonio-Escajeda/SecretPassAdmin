@@ -1,8 +1,10 @@
 node_modules/
 .env
+.cloudflared.env
 NOTAS.md
 NGINX_OPERACION.md
 dist/
 certs/
 SecretPassAdmin.code-workspace
 evidence/
+*.swp

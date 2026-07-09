@@ -42,3 +42,11 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  cloudflared:
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url https://web:443 --no-tls-verify
+    restart: unless-stopped
+    depends_on:
+      - web
