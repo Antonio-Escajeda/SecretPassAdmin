@@ -46,7 +46,7 @@ services:
   cloudflared:
     profiles: ["tunnel"]
     image: cloudflare/cloudflared:latest
-    command: tunnel --url https://web:443 --no-tls-verify
+    command: tunnel --url https://web:443 --no-tls-verify --protocol http2
     restart: unless-stopped
     depends_on:
       - web

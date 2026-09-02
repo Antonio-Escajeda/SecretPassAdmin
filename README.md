@@ -20,7 +20,7 @@ docker compose --profile tunnel up -d
 ### Ver la URL pública actual del túnel
 
 ```bash
-docker compose logs cloudflared --tail 50 | rg 'trycloudflare.com'
+docker compose logs cloudflared | rg -o 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -n1
 ```
 
 ### Bajar todo
@@ -334,8 +334,10 @@ Levanta:
 La URL pública temporal se puede consultar con:
 
 ```bash
-docker compose logs cloudflared --tail 50 | rg 'trycloudflare.com'
+docker compose logs cloudflared | rg -o 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -n1
 ```
+
+> La URL cambia en cada recreación del contenedor `cloudflared` (Quick Tunnel es efímero por diseño).
 
 ### Bajar todo
 

@@ -15,7 +15,7 @@ fi
 quick_tunnel_url=""
 
 for _ in {1..30}; do
-  quick_tunnel_url="$({ docker compose logs cloudflared --tail 50 2>/dev/null || true; } | rg -o 'https://[a-z0-9-]+\.trycloudflare\.com' -m 1 || true)"
+  quick_tunnel_url="$({ docker compose logs cloudflared 2>/dev/null || true; } | rg -o 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -n1 || true)"
 
   if [[ -n "$quick_tunnel_url" ]]; then
     break
