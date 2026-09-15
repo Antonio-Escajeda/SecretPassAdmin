@@ -8,8 +8,19 @@ key_file="$cert_dir/localhost+1-key.pem"
 
 if [[ ! -f "$cert_file" || ! -f "$key_file" ]]; then
   if ! command -v mkcert >/dev/null 2>&1; then
-    echo "mkcert no está instalado. Instalalo (https://github.com/FiloSottile/mkcert) y volvé a correr este script." >&2
-    exit 1
+    echo "mkcert no está instalado. Instalando..." >&2
+    if command -v brew >/dev/null 2>&1; then
+      brew install mkcert
+    elif command -v apt-get >/dev/null 2>&1; then
+      sudo apt-get update && sudo apt-get install -y mkcert libnss3-tools
+    elif command -v dnf >/dev/null 2>&1; then
+      sudo dnf install -y mkcert nss-tools
+    elif command -v pacman >/dev/null 2>&1; then
+      sudo pacman -Sy --noconfirm mkcert nss
+    else
+      echo "No se pudo detectar un gestor de paquetes soportado (brew/apt/dnf/pacman). Instalá mkcert manualmente: https://github.com/FiloSottile/mkcert" >&2
+      exit 1
+    fi
   fi
 
   mkdir -p "$cert_dir"

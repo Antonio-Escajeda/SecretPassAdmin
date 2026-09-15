@@ -8,8 +8,9 @@ Extiende la versión base con soporte de passphrase opcional usando Argon2id.
 ### Requisito: certificados TLS locales
 
 `web` sirve HTTPS con certificados generados por [mkcert](https://github.com/FiloSottile/mkcert).
-`./up.sh` los genera automáticamente en `certs/` la primera vez que se corre (requiere `mkcert`
-instalado). Si preferís usar `docker compose up -d` directamente, generalos antes a mano:
+`./up.sh` instala `mkcert` si falta (vía `brew`/`apt`/`dnf`/`pacman`, puede pedir sudo) y genera
+los certificados en `certs/` la primera vez que se corre. Si preferís usar `docker compose up -d`
+directamente, instalá `mkcert` y generalos antes a mano:
 
 ```bash
 mkcert -install
