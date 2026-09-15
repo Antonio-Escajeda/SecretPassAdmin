@@ -2,6 +2,21 @@
 
 set -euo pipefail
 
+cert_dir="$(dirname "$0")/certs"
+cert_file="$cert_dir/localhost+1.pem"
+key_file="$cert_dir/localhost+1-key.pem"
+
+if [[ ! -f "$cert_file" || ! -f "$key_file" ]]; then
+  if ! command -v mkcert >/dev/null 2>&1; then
+    echo "mkcert no está instalado. Instalalo (https://github.com/FiloSottile/mkcert) y volvé a correr este script." >&2
+    exit 1
+  fi
+
+  mkdir -p "$cert_dir"
+  mkcert -install || echo "Aviso: no se pudo instalar/confirmar la CA local de mkcert (¿falta sudo interactivo?). Si el navegador no confía en el certificado, corré 'mkcert -install' manualmente." >&2
+  mkcert -cert-file "$cert_file" -key-file "$key_file" localhost 127.0.0.1
+fi
+
 tunnel_mode="false"
 
 if [[ "${1:-}" == "tunnel" ]]; then

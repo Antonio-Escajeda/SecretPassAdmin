@@ -5,16 +5,27 @@ Extiende la versión base con soporte de passphrase opcional usando Argon2id.
 
 ## Comandos rápidos
 
+### Requisito: certificados TLS locales
+
+`web` sirve HTTPS con certificados generados por [mkcert](https://github.com/FiloSottile/mkcert).
+`./up.sh` los genera automáticamente en `certs/` la primera vez que se corre (requiere `mkcert`
+instalado). Si preferís usar `docker compose up -d` directamente, generalos antes a mano:
+
+```bash
+mkcert -install
+mkcert -cert-file certs/localhost+1.pem -key-file certs/localhost+1-key.pem localhost 127.0.0.1
+```
+
 ### Levantar sin túnel
 
 ```bash
-docker compose up -d
+./up.sh
 ```
 
 ### Levantar con túnel temporal de Cloudflare
 
 ```bash
-docker compose --profile tunnel up -d
+./up.sh tunnel
 ```
 
 ### Ver la URL pública actual del túnel
@@ -303,11 +314,13 @@ secret-service/
 
 ## Levantar el proyecto
 
+`web` requiere certificados TLS en `certs/` (ver [Requisito: certificados TLS
+locales](#requisito-certificados-tls-locales)). `./up.sh` los genera automáticamente si faltan.
+
 ### Sin túnel
 
 ```bash
-cd secret-service
-docker compose up -d
+./up.sh
 ```
 
 Levanta:
@@ -316,12 +329,12 @@ Levanta:
 - `api`
 - `web`
 
-Abre `http://localhost` en el navegador.
+Abre `https://localhost` en el navegador.
 
 ### Con túnel público temporal (Cloudflare Quick Tunnel)
 
 ```bash
-docker compose --profile tunnel up -d
+./up.sh tunnel
 ```
 
 Levanta:
